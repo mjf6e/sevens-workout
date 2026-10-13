@@ -14,7 +14,7 @@ Sevens is an independent project inspired by the 12-exercise HICT circuit descri
 
 ## Exercise images
 
-Illustrations go in `exercise-images/`. The file names that `exercise-data.js` expects are listed in that file. Exercises without an image show a letter tile instead.
+Illustrations go in a folder named `Darebee exercise images/` at the repo root. The file names the app expects are listed in `exercise-data.js`. Exercises without an image show a letter tile instead.
 
 ## Run locally
 
