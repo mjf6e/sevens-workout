@@ -1,35 +1,36 @@
 /* Exercise illustrations and extra exercises.
-   Images live in the "Darebee exercise images" folder. A missing file simply falls back to a letter tile. */
+   Images live in the "Darebee exercise images" folder (the background-removed versions).
+   A missing file simply falls back to a letter tile. */
 window.SV_IMG = {
   // Exercises that were already in the app
-  birddog: "Darebee exercise images/bird dog.png",
-  burpee: "Darebee exercise images/Burpees.png",
-  diamond: "Darebee exercise images/diamond (close grip) push up.png",
-  plankleg: "Darebee exercise images/full raised leg plank.png",
-  sideplank: "Darebee exercise images/full side plank.png",
-  highknees: "Darebee exercise images/high knees.png",
-  jumpsq: "Darebee exercise images/jump squat.png",
-  jj: "Darebee exercise images/jumping jacks.png",
-  lunge: "Darebee exercise images/lunge.png",
-  mountain: "Darebee exercise images/mountain climbers.png",
-  plank: "Darebee exercise images/plank hold.png",
-  pushup: "Darebee exercise images/push up.png",
-  backlunge: "Darebee exercise images/reverse lunge.png",
-  sidelunge: "Darebee exercise images/side lunges.png",
-  russian: "Darebee exercise images/sitting twists.png",
-  skater: "Darebee exercise images/skater.png",
-  squat: "Darebee exercise images/squat.png",
-  stagpush: "Darebee exercise images/staggered push up.png",
-  dip: "Darebee exercise images/tricep dip.png",
-  widepush: "Darebee exercise images/wide grip push up.png",
+  birddog: "Darebee exercise images/bird_dog-removebg-preview.png",
+  burpee: "Darebee exercise images/Burpees-removebg-preview.png",
+  diamond: "Darebee exercise images/diamond__close_grip__push_up-removebg-preview.png",
+  plankleg: "Darebee exercise images/full_raised_leg_plank-removebg-preview.png",
+  sideplank: "Darebee exercise images/full_side_plank-removebg-preview.png",
+  highknees: "Darebee exercise images/high_knees-removebg-preview.png",
+  jumpsq: "Darebee exercise images/jump_squat-removebg-preview.png",
+  jj: "Darebee exercise images/jumping_jacks-removebg-preview.png",
+  lunge: "Darebee exercise images/lunge-removebg-preview.png",
+  mountain: "Darebee exercise images/mountain_climbers-removebg-preview.png",
+  plank: "Darebee exercise images/plank_hold-removebg-preview.png",
+  pushup: "Darebee exercise images/push_up-removebg-preview.png",
+  backlunge: "Darebee exercise images/reverse_lunge-removebg-preview.png",
+  sidelunge: "Darebee exercise images/side_lunges-removebg-preview.png",
+  russian: "Darebee exercise images/sitting_twists-removebg-preview.png",
+  skater: "Darebee exercise images/skater-removebg-preview.png",
+  squat: "Darebee exercise images/squat-removebg-preview.png",
+  stagpush: "Darebee exercise images/staggered_push_up-removebg-preview.png",
+  dip: "Darebee exercise images/tricep_dip-removebg-preview.png",
+  widepush: "Darebee exercise images/wide_grip_push_up-removebg-preview.png",
   // New exercises added from the image set
-  deadbug: "Darebee exercise images/dead bug.png",
-  highplank: "Darebee exercise images/full plank.png",
-  heeltaps: "Darebee exercise images/heel taps.png",
-  kneecrunch: "Darebee exercise images/knee crunches.png",
-  deepside: "Darebee exercise images/side lunges.2.png",
-  superman: "Darebee exercise images/superman.png",
-  updownplank: "Darebee exercise images/up & down plank.png"
+  deadbug: "Darebee exercise images/dead_bug-removebg-preview.png",
+  highplank: "Darebee exercise images/full_plank-removebg-preview.png",
+  heeltaps: "Darebee exercise images/heel_taps-removebg-preview.png",
+  kneecrunch: "Darebee exercise images/knee_crunches-removebg-preview.png",
+  deepside: "Darebee exercise images/side_lunges.2-removebg-preview.png",
+  superman: "Darebee exercise images/superman-removebg-preview.png",
+  updownplank: "Darebee exercise images/up___down_plank-removebg-preview.png"
 };
 
 window.SV_EXTRA = [
