@@ -65,7 +65,11 @@ h2{font-family:"Big Shoulders Display",sans-serif;font-size:30px;margin:26px 0 1
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .ex{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;width:100%;text-align:left}
-.glyph{flex:none;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;font-family:"Big Shoulders Display",sans-serif;font-weight:900;font-size:22px}
+.glyph{position:relative;overflow:hidden;flex:none;width:56px;height:56px;border-radius:12px;display:grid;place-items:center;color:#fff;font-family:"Big Shoulders Display",sans-serif;font-weight:900;font-size:24px}
+.glyph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.exbig{display:block;width:100%;max-height:260px;object-fit:contain;background:#fff;border-radius:14px;margin:14px 0 0}
+.credit{margin:6px 0 0}
+.credit a{color:inherit}
 .ex h3{margin:0;font-size:16px}
 .ex p{margin:0;color:var(--muted);font-size:13px}
 .lv{margin-left:auto;display:flex;gap:3px;flex:none}
@@ -101,6 +105,9 @@ input[type=text]{width:100%;padding:12px;border-radius:12px;border:1px solid var
 .phase{font-weight:700;font-size:18px;opacity:.9;margin:0}
 .pname{font-family:"Big Shoulders Display",sans-serif;font-weight:900;font-size:clamp(40px,11vw,84px);line-height:.95;margin:8px 0 0}
 .clock{font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:clamp(130px,42vw,260px);line-height:.9;margin:8px 0;font-variant-numeric:tabular-nums}
+.pimg{background:#fff;border-radius:16px;padding:6px;max-height:24vh;max-width:78%;object-fit:contain;margin-bottom:10px}
+.hasimg .pname{font-size:clamp(32px,9vw,60px)}
+.hasimg .clock{font-size:clamp(90px,28vw,180px)}
 .cue{max-width:480px;font-size:17px;opacity:.95;margin:0}
 .next{font-size:15px;opacity:.85;margin-top:12px}
 .pctl{display:flex;gap:12px;justify-content:center;align-items:center}
@@ -124,6 +131,7 @@ input[type=text]{width:100%;padding:12px;border-radius:12px;border:1px solid var
 <div id="layer"></div>
 <div id="playerHost"></div>
 
+<script src="exercise-data.js"></script>
 <script>
 (function(){
 "use strict";
@@ -183,6 +191,8 @@ var EX = [
  {id:"march",n:"Marching in Place",f:"cardio",lv:1,t:"Low-impact high knees. Lift knees with a steady pace and swing your arms."},
  {id:"buttkick",n:"Butt Kicks",f:"cardio",lv:1,t:"Jog in place, kicking heels up toward your glutes."}
 ];
+// Extra exercises (and their illustrations) are defined in exercise-data.js
+(window.SV_EXTRA||[]).forEach(function(e){EX.push(e);});
 var BY = {}; EX.forEach(function(e){BY[e.id]=e;});
 
 // Presets: ids, work seconds, rest seconds
@@ -210,6 +220,7 @@ var S = {
 /* ---------- Helpers ---------- */
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function $(id){return document.getElementById(id);}
+function exImg(e){var p=(window.SV_IMG||{})[e.id];return p?encodeURI(p):"";}
 function steps(w){ // expand a workout into a timeline
   var segs=[], ex=w.x.map(function(id){return BY[id];}), total=ex.length;
   segs.push({t:"ready",d:S.set.ready,ex:ex[0],i:0,label:""});
@@ -230,7 +241,7 @@ function minutes(w){
 function fmt(sec){var m=Math.floor(sec/60),s=sec%60;return m+":"+(s<10?"0":"")+s;}
 function bar(w){return '<div class="bar" aria-hidden="true">'+w.x.map(function(id){return '<i style="background:'+FOCUS[BY[id].f].color+'"></i>';}).join("")+'</div>';}
 function levelDots(n){return '<span class="lv" aria-label="Level '+n+' of 3">'+[1,2,3].map(function(i){return '<i class="'+(i<=n?"on":"")+'"></i>';}).join("")+'</span>';}
-function glyph(e){return '<div class="glyph" style="background:'+FOCUS[e.f].color+'" aria-hidden="true">'+esc(e.n.charAt(0))+'</div>';}
+function glyph(e){var u=exImg(e);return '<div class="glyph" style="background:'+FOCUS[e.f].color+'" aria-hidden="true">'+esc(e.n.charAt(0))+(u?'<img src="'+u+'" alt="" loading="lazy" onerror="this.remove()">':'')+'</div>';}
 
 /* ---------- Views ---------- */
 var tab="home", filter="all", impact="all";
@@ -261,7 +272,7 @@ function viewHome(){
   if(S.custom.length){
     h+='<h2>Your workouts</h2><div class="list">'+S.custom.map(function(p){return presetCard(p,"custom");}).join("")+'</div>';
   }
-  h+='<p class="note" style="margin-top:22px">Sevens is an independent app inspired by the 12-exercise HICT circuit described by Brett Klika and Chris Jordan. It is not affiliated with or endorsed by any company. Talk to a doctor before starting a new exercise program.</p>';
+  h+='<p class="note" style="margin-top:22px">Sevens is an independent app inspired by the 12-exercise HICT circuit described by Brett Klika and Chris Jordan. It is not affiliated with or endorsed by any company. Exercise illustrations by <a href="https://darebee.com" target="_blank" rel="noopener" style="color:inherit">DAREBEE</a>. Talk to a doctor before starting a new exercise program.</p>';
   return h;
 }
 function presetCard(p,kind){
@@ -316,7 +327,9 @@ function workoutSheet(w,kind){
   openSheet(h);
 }
 function exSheet(e){
+  var u=exImg(e);
   var h='<div class="row">'+glyph(e)+'<div><h3 class="big" style="font-size:32px">'+esc(e.n)+'</h3><p class="tag" style="margin:0">'+FOCUS[e.f].label+(e.sides?", each side":"")+'</p></div></div>';
+  if(u) h+='<img class="exbig" src="'+u+'" alt="'+esc(e.n)+' illustration" onerror="this.remove()"><p class="note credit">Illustration by <a href="https://darebee.com" target="_blank" rel="noopener">DAREBEE</a></p>';
   h+='<p style="font-size:18px;margin:16px 0">'+esc(e.t)+'</p><p class="note">Difficulty '+levelDots(e.lv)+(e.imp?' &nbsp;Involves jumping. Swap for a low-impact move if you need quiet or joint relief.':'')+'</p>';
   h+='<button class="primary" data-act="close" style="margin-top:14px">Done</button>';
   openSheet(h);
@@ -420,10 +433,11 @@ function drawPlayer(){
   var title=s.t==="rest"?"Next: "+s.next.n:e.n;
   var prog=P.w.x.map(function(_,i){return '<i class="'+(i<(s.t==="rest"?s.i+1:s.i)?"d":"")+'"></i>';}).join("");
   var cue=s.t==="work"||s.t==="ready"?e.t:(s.next.t);
-  host.innerHTML='<div id="player" class="'+cls+'" role="dialog" aria-label="Workout in progress">'+
+  var u=exImg(s.t==="rest"?s.next:e);
+  host.innerHTML='<div id="player" class="'+cls+(u?' hasimg':'')+'" role="dialog" aria-label="Workout in progress">'+
     '<div class="ptop"><button data-pl="exit">End</button><span style="font-weight:700">'+esc(P.w.n)+'</span><span style="width:60px;text-align:right;font-weight:700">'+(s.t==="ready"?0:(s.t==="rest"?s.i+1:s.i+1))+'/'+P.total+'</span></div>'+
     '<div class="prog" aria-hidden="true">'+prog+'</div>'+
-    '<div class="pmid"><p class="phase">'+label+(s.label?', '+s.label:"")+'</p><h2 class="pname">'+esc(title)+'</h2><div class="clock '+(s.t==="work"?"pulse":"")+'" id="clk" aria-live="off">'+Math.max(0,Math.ceil(P.left/1000))+'</div><p class="cue">'+esc(cue)+'</p></div>'+
+    '<div class="pmid">'+(u?'<img class="pimg" src="'+u+'" alt="" onerror="this.remove()">':'')+'<p class="phase">'+label+(s.label?', '+s.label:"")+'</p><h2 class="pname">'+esc(title)+'</h2><div class="clock '+(s.t==="work"?"pulse":"")+'" id="clk" aria-live="off">'+Math.max(0,Math.ceil(P.left/1000))+'</div><p class="cue">'+esc(cue)+'</p></div>'+
     '<div class="pctl"><button data-pl="back" aria-label="Previous">Back</button><button class="main" data-pl="pause">'+(P.paused?"Resume":"Pause")+'</button><button data-pl="skip" aria-label="Skip">Skip</button></div>'+
   '</div>';
 }
