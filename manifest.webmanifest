@@ -1,0 +1,14 @@
+{
+  "name": "Sevens: Circuit Workouts",
+  "short_name": "Sevens",
+  "description": "No-equipment HIIT circuit workouts with presets, an exercise library, a custom builder, and adaptive Smart Workouts.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#E9F0FF",
+  "theme_color": "#2340F0",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sevens: Circuit Workouts</title>
+<meta name="description" content="No-equipment HIIT circuit workouts with presets, an exercise library, a custom builder, and adaptive Smart Workouts.">
+<meta name="theme-color" content="#2340F0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sevens">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9F0FF; --surface:#FFFFFF; --ink:#0B1B4D; --muted:#5A6791; --line:#CBD6F5;
+  --cobalt:#2340F0; --cobalt-ink:#FFFFFF; --work:#FF5A47; --rest:#12A377; --soft:#DCE5FF;
+  --upper:#2340F0; --lower:#12A377; --core:#E5A000; --cardio:#FF5A47; --total:#7A3FE0;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A1230; --surface:#121D47; --ink:#EAF0FF; --muted:#9AA8D6; --line:#243268; --soft:#1A2757;
+    --cobalt:#5B74FF; --work:#FF7A69; --rest:#35C79A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A1230; --surface:#121D47; --ink:#EAF0FF; --muted:#9AA8D6; --line:#243268; --soft:#1A2757;
+  --cobalt:#5B74FF; --work:#FF7A69; --rest:#35C79A;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--cobalt);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:20px 18px 110px}
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px}
+h1{font-family:"Big Shoulders Display",Impact,sans-serif;font-weight:900;font-size:64px;line-height:.9;margin:0;letter-spacing:-.01em}
+.tag{color:var(--muted);margin:6px 0 0;font-size:15px}
+.iconbtn{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-weight:600}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));z-index:5}
+nav.tabs button{flex:1;max-width:160px;background:none;border:0;padding:10px 6px;border-radius:12px;font-weight:700;color:var(--muted)}
+nav.tabs button[aria-current="page"]{background:var(--soft);color:var(--ink)}
+.stats{display:flex;gap:10px;margin:0 0 20px}
+.stat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat b{font-family:"Big Shoulders Display",sans-serif;font-size:34px;line-height:1;display:block}
+.stat span{color:var(--muted);font-size:13px}
+h2{font-family:"Big Shoulders Display",sans-serif;font-size:30px;margin:26px 0 10px;font-weight:800}
+.list{display:grid;gap:10px}
+.preset{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.preset:hover{border-color:var(--cobalt)}
+.dur{flex:none;width:68px;height:68px;border-radius:14px;background:var(--cobalt);color:var(--cobalt-ink);display:grid;place-items:center;text-align:center;font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:28px;line-height:.9}
+.dur small{display:block;font-family:Figtree,sans-serif;font-size:11px;font-weight:600;opacity:.85}
+.preset h3{margin:0;font-size:18px}
+.preset p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.bar{display:flex;gap:2px;margin-top:8px}
+.bar i{height:6px;flex:1;border-radius:3px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ex{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;width:100%;text-align:left}
+.glyph{flex:none;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;font-family:"Big Shoulders Display",sans-serif;font-weight:900;font-size:22px}
+.ex h3{margin:0;font-size:16px}
+.ex p{margin:0;color:var(--muted);font-size:13px}
+.lv{margin-left:auto;display:flex;gap:3px;flex:none}
+.lv i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.lv i.on{background:var(--ink)}
+.sheet{position:fixed;inset:0;background:rgba(5,10,35,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.panel{background:var(--bg);width:100%;max-width:760px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom,0px))}
+.panel h3.big{font-family:"Big Shoulders Display",sans-serif;font-size:38px;margin:0 0 4px;line-height:1}
+.primary{background:var(--cobalt);color:var(--cobalt-ink);border:0;border-radius:14px;padding:15px 22px;font-weight:700;font-size:17px;width:100%}
+.ghost{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-weight:600}
+.row{display:flex;gap:10px;align-items:center}
+.steps{margin:12px 0 0;padding-left:20px}
+.steps li{margin:6px 0}
+.seq{display:grid;gap:6px;margin:14px 0}
+.seq div{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.seq span.n{width:26px;text-align:center;font-weight:700;color:var(--muted)}
+label.f{display:block;font-weight:600;margin:14px 0 4px}
+input[type=range]{width:100%}
+input[type=text]{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit}
+.tgl{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+/* player */
+#player{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(18px + env(safe-area-inset-bottom,0px));color:#fff;transition:background .25s}
+#player.work{background:#E0432F}
+#player.rest{background:#0E7F5E}
+#player.ready{background:#1C2FB8}
+#player.done{background:#14214F}
+.ptop{display:flex;justify-content:space-between;align-items:center}
+.ptop button{background:rgba(255,255,255,.18);border:0;border-radius:12px;color:#fff;padding:9px 14px;font-weight:700}
+.prog{display:flex;gap:3px;margin:14px 0}
+.prog i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.28)}
+.prog i.d{background:#fff}
+.pmid{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:0}
+.phase{font-weight:700;font-size:18px;opacity:.9;margin:0}
+.pname{font-family:"Big Shoulders Display",sans-serif;font-weight:900;font-size:clamp(40px,11vw,84px);line-height:.95;margin:8px 0 0}
+.clock{font-family:"Big Shoulders Display",sans-serif;font-weight:800;font-size:clamp(130px,42vw,260px);line-height:.9;margin:8px 0;font-variant-numeric:tabular-nums}
+.cue{max-width:480px;font-size:17px;opacity:.95;margin:0}
+.next{font-size:15px;opacity:.85;margin-top:12px}
+.pctl{display:flex;gap:12px;justify-content:center;align-items:center}
+.pctl button{background:rgba(255,255,255,.2);border:0;color:#fff;border-radius:50%;width:64px;height:64px;font-weight:800;font-size:15px}
+.pctl button.main{width:88px;height:88px;background:#fff;color:#14214F;font-size:17px}
+.fbrow{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;justify-content:center}
+.fbrow button{background:rgba(255,255,255,.2);border:0;color:#fff;border-radius:12px;padding:13px 16px;font-weight:700}
+.pulse{animation:pulse 1s ease-in-out infinite}
+.clock.pop{animation:pop .45s ease-out}
+@keyframes pop{from{transform:scale(1.14)}to{transform:scale(1)}}
+@keyframes pulse{50%{transform:scale(1.02)}}
+@media (prefers-reduced-motion:reduce){.pulse,.clock.pop{animation:none}#player{transition:none}}
+.empty{color:var(--muted);padding:20px;border:1px dashed var(--line);border-radius:14px;text-align:center}
+.note{color:var(--muted);font-size:13px}
+@media (min-width:700px){h1{font-size:84px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<nav class="tabs" id="tabs" aria-label="Main"></nav>
+<div id="layer"></div>
+<div id="playerHost"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Data ---------- */
+var FOCUS = {
+  upper:{label:"Upper body",color:"var(--upper)",ab:"U"},
+  lower:{label:"Lower body",color:"var(--lower)",ab:"L"},
+  core:{label:"Core",color:"var(--core)",ab:"C"},
+  cardio:{label:"Cardio",color:"var(--cardio)",ab:"H"},
+  total:{label:"Total body",color:"var(--total)",ab:"T"}
+};
+// lv: 1 easy, 2 medium, 3 hard. imp: 1 = high impact (jumping)
+var EX = [
+ // Core 12 baseline
+ {id:"jj",n:"Jumping Jacks",f:"total",lv:2,imp:1,base:1,t:"Jump feet wide while arms sweep overhead, then return. Land softly on the balls of your feet."},
+ {id:"wallsit",n:"Wall Sit",f:"lower",lv:2,base:1,t:"Back flat on the wall, thighs parallel to the floor, knees over ankles. Hold still and breathe."},
+ {id:"pushup",n:"Push-Up",f:"upper",lv:2,base:1,t:"Hands under shoulders, body in one straight line. Lower your chest to the floor, press back up."},
+ {id:"crunch",n:"Abdominal Crunch",f:"core",lv:1,base:1,t:"Lie on your back, knees bent, hands by your ears. Curl shoulders off the floor, no neck pulling."},
+ {id:"stepup",n:"Step-Up onto Chair",f:"total",lv:2,base:1,t:"Plant your whole foot on a sturdy chair, drive up, then step down. Alternate lead legs."},
+ {id:"squat",n:"Squat",f:"lower",lv:1,base:1,t:"Feet shoulder width, hips back and down, chest tall, knees tracking over toes."},
+ {id:"dip",n:"Triceps Dip on Chair",f:"upper",lv:2,base:1,t:"Hands on the chair edge, hips just off the seat. Bend elbows straight back, press up."},
+ {id:"plank",n:"Plank",f:"core",lv:2,base:1,t:"Forearms down, body straight from head to heels. Squeeze glutes and abs, do not sag."},
+ {id:"highknees",n:"High Knees",f:"cardio",lv:2,imp:1,base:1,t:"Run in place, driving knees to hip height with quick arm swings."},
+ {id:"lunge",n:"Lunge",f:"lower",lv:2,base:1,t:"Step forward, lower until both knees reach about 90 degrees, push back to standing. Alternate legs."},
+ {id:"pushrot",n:"Push-Up and Rotation",f:"upper",lv:3,base:1,t:"Complete a push-up, then rotate into a side plank and reach one arm to the ceiling. Alternate sides."},
+ {id:"sideplank",n:"Side Plank",f:"core",lv:2,sides:1,base:1,t:"Forearm under shoulder, hips lifted, body in a straight line. Switch sides at the halfway mark."},
+ // Upper
+ {id:"kneepush",n:"Knee Push-Up",f:"upper",lv:1,t:"Same form as a push-up with knees on the floor. Keep hips in line with shoulders."},
+ {id:"stagpush",n:"Staggered Hands Push-Up",f:"upper",lv:2,t:"One hand forward, one back. Lower, press, and swap hand positions each set of reps."},
+ {id:"widepush",n:"Wide-Grip Push-Up",f:"upper",lv:2,t:"Hands wider than shoulders to load the chest. Keep elbows at about 45 degrees."},
+ {id:"diamond",n:"Diamond Push-Up",f:"upper",lv:3,t:"Hands together under your chest, thumbs and index fingers forming a diamond. Elbows hug your ribs."},
+ {id:"spider",n:"Spider-Man Push-Up",f:"upper",lv:3,t:"On each rep, bring one knee toward the same-side elbow as you lower. Alternate sides."},
+ {id:"decline",n:"Decline Push-Up",f:"upper",lv:3,t:"Feet on a chair, hands on the floor. Keep your core braced and lower with control."},
+ {id:"incline",n:"Incline Push-Up",f:"upper",lv:1,t:"Hands on a chair or the wall, body straight. The higher the hands, the easier the rep."},
+ {id:"tpush",n:"T Push-Up",f:"upper",lv:3,t:"After each push-up, rotate and reach one arm up into a T. Return and repeat on the other side."},
+ // Lower
+ {id:"narrowsq",n:"Narrow-Stance Squat",f:"lower",lv:2,t:"Feet close together. Sit back and down, keeping heels planted."},
+ {id:"sumo",n:"Wide-Stance Sumo Squat",f:"lower",lv:2,t:"Feet wide, toes turned out. Drop straight down, knees pushing out over toes."},
+ {id:"jumpsq",n:"Jump Squat",f:"lower",lv:3,imp:1,t:"Squat down, explode upward, land softly and flow into the next rep."},
+ {id:"backlunge",n:"Backward Lunge",f:"lower",lv:1,t:"Step back and lower the rear knee toward the floor. Drive through the front heel. Alternate legs."},
+ {id:"sidelunge",n:"Side Lunge",f:"lower",lv:2,t:"Step wide to the side, sit into that hip with the other leg straight. Push back to center."},
+ {id:"swall",n:"Single-Leg Wall Sit",f:"lower",lv:3,sides:1,t:"Hold a wall sit, then extend one leg straight out. Switch legs at the halfway mark."},
+ {id:"ssquat",n:"Single-Leg Squat",f:"lower",lv:3,sides:1,t:"Balance on one leg, reach the other forward and sit back. Hold a chair if you need support."},
+ // Core
+ {id:"bicycle",n:"Bicycle Crunch",f:"core",lv:2,t:"Opposite elbow to opposite knee while the other leg extends. Slow and controlled."},
+ {id:"reverse",n:"Reverse Crunch",f:"core",lv:2,t:"Curl knees toward your chest and lift hips an inch off the floor. Lower without swinging."},
+ {id:"legraise",n:"Straight-Leg Raise",f:"core",lv:2,t:"Legs straight, lift to vertical, lower slowly without letting your lower back arch."},
+ {id:"russian",n:"Russian Twist",f:"core",lv:2,t:"Seated, torso leaned back, feet lifted if you can. Rotate side to side, touching the floor each time."},
+ {id:"plankleg",n:"Plank with Leg Lift",f:"core",lv:3,t:"From plank, lift one leg to hip height, lower, switch. Keep hips level."},
+ {id:"sprot",n:"Side Plank with Rotation",f:"core",lv:3,sides:1,t:"From a side plank, thread the top arm under your body and back up. Switch sides at halfway."},
+ {id:"birddog",n:"Bird-Dog",f:"core",lv:1,t:"On hands and knees, extend opposite arm and leg. Hold a beat, switch."},
+ // Cardio
+ {id:"burpee",n:"Burpee",f:"cardio",lv:3,imp:1,t:"Squat, hands down, jump feet back, push-up, jump feet in, then jump up."},
+ {id:"mountain",n:"Mountain Climber",f:"cardio",lv:2,t:"In a high plank, drive knees toward your chest in a fast running rhythm."},
+ {id:"skater",n:"Skater Hops",f:"cardio",lv:2,imp:1,t:"Bound side to side, landing on one leg and sweeping the other behind you."},
+ {id:"march",n:"Marching in Place",f:"cardio",lv:1,t:"Low-impact high knees. Lift knees with a steady pace and swing your arms."},
+ {id:"buttkick",n:"Butt Kicks",f:"cardio",lv:1,t:"Jog in place, kicking heels up toward your glutes."}
+];
+var BY = {}; EX.forEach(function(e){BY[e.id]=e;});
+
+// Presets: ids, work seconds, rest seconds
+var PRESETS = [
+ {id:"orig",n:"The Original 7-Minute Workout",d:"The classic 12-exercise circuit, 30 seconds on and 10 off.",w:30,r:10,x:"jj wallsit pushup crunch stepup squat dip plank highknees lunge pushrot sideplank".split(" ")},
+ {id:"first",n:"First-Timer",d:"A gentle intro using lighter variations and more time to recover.",w:25,r:15,x:"march wallsit kneepush crunch stepup squat dip plank birddog backlunge incline reverse".split(" ")},
+ {id:"adv",n:"Advanced 7-Minute Workout",d:"Baseline moves swapped for jump squats, spider push-ups and single-leg holds.",w:40,r:10,x:"burpee swall spider bicycle skater jumpsq dip plankleg mountain sidelunge tpush sprot".split(" ")},
+ {id:"cardio",n:"Cardio Blast",d:"High tempo moves built to keep your heart rate up.",w:40,r:15,x:"jj burpee highknees mountain skater jumpsq buttkick jj highknees burpee".split(" ")},
+ {id:"core",n:"Core Strength",d:"Plank and crunch variations, nothing else.",w:40,r:10,x:"plank crunch bicycle reverse legraise russian plankleg sideplank birddog mountain".split(" ")},
+ {id:"upper",n:"Upper Body Split",d:"Push-up variations and dips to isolate your upper half.",w:40,r:10,x:"pushup widepush diamond dip stagpush decline spider tpush pushrot plank".split(" ")},
+ {id:"lower",n:"Lower Body Split",d:"Squats, lunges and holds for legs and glutes.",w:40,r:10,x:"squat wallsit lunge sumo jumpsq backlunge sidelunge narrowsq stepup swall".split(" ")},
+ {id:"low",n:"Low-Impact Burn",d:"No jumping. Quiet enough for an apartment or an office.",w:35,r:10,x:"march wallsit incline squat crunch backlunge birddog reverse dip plank".split(" ")}
+];
+
+/* ---------- Storage ---------- */
+function load(k,def){try{var v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+var S = {
+  hist: load("sv_hist",[]),
+  custom: load("sv_custom",[]),
+  set: load("sv_set",{voice:true,sound:true,ready:5}),
+  smart: load("sv_smart",{lvl:1.5,seeded:false,last:[]})
+};
+
+/* ---------- Helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function $(id){return document.getElementById(id);}
+function steps(w){ // expand a workout into a timeline
+  var segs=[], ex=w.x.map(function(id){return BY[id];}), total=ex.length;
+  segs.push({t:"ready",d:S.set.ready,ex:ex[0],i:0,label:""});
+  ex.forEach(function(e,i){
+    if(e.sides){
+      var h=Math.round(w.w/2);
+      segs.push({t:"work",d:h,ex:e,i:i,label:"Left side"});
+      segs.push({t:"work",d:w.w-h,ex:e,i:i,label:"Right side",sw:1});
+    } else segs.push({t:"work",d:w.w,ex:e,i:i,label:""});
+    if(i<total-1) segs.push({t:"rest",d:w.r,ex:ex[i+1],i:i,label:"",next:ex[i+1]});
+  });
+  return segs;
+}
+function minutes(w){
+  var s=0; w.x.forEach(function(id,i){s+=w.w; if(i<w.x.length-1)s+=w.r;});
+  return s;
+}
+function fmt(sec){var m=Math.floor(sec/60),s=sec%60;return m+":"+(s<10?"0":"")+s;}
+function bar(w){return '<div class="bar" aria-hidden="true">'+w.x.map(function(id){return '<i style="background:'+FOCUS[BY[id].f].color+'"></i>';}).join("")+'</div>';}
+function levelDots(n){return '<span class="lv" aria-label="Level '+n+' of 3">'+[1,2,3].map(function(i){return '<i class="'+(i<=n?"on":"")+'"></i>';}).join("")+'</span>';}
+function glyph(e){return '<div class="glyph" style="background:'+FOCUS[e.f].color+'" aria-hidden="true">'+esc(e.n.charAt(0))+'</div>';}
+
+/* ---------- Views ---------- */
+var tab="home", filter="all", impact="all";
+var TABS=[["home","Workouts"],["lib","Library"],["build","Build"],["hist","Progress"]];
+
+function renderTabs(){
+  $("tabs").innerHTML=TABS.map(function(t){return '<button data-tab="'+t[0]+'" '+(tab===t[0]?'aria-current="page"':'')+'>'+t[1]+'</button>';}).join("");
+}
+function render(){
+  renderTabs();
+  var h="";
+  if(tab==="home") h=viewHome();
+  else if(tab==="lib") h=viewLib();
+  else if(tab==="build") h=viewBuild();
+  else h=viewHist();
+  $("app").innerHTML=h;
+}
+function header(sub){
+  return '<header class="top"><div><h1>Sevens</h1><p class="tag">'+esc(sub)+'</p></div><button class="iconbtn" data-act="settings" aria-label="Settings">Settings</button></header>';
+}
+function viewHome(){
+  var week=S.hist.filter(function(x){return Date.now()-x.at<7*864e5;}).length;
+  var mins=Math.round(S.hist.reduce(function(a,x){return a+x.sec;},0)/60);
+  var h=header("High-intensity circuit training, no equipment but a chair.");
+  h+='<div class="stats"><div class="stat"><b>'+week+'</b><span>this week</span></div><div class="stat"><b>'+S.hist.length+'</b><span>total workouts</span></div><div class="stat"><b>'+mins+'</b><span>minutes trained</span></div></div>';
+  h+='<button class="preset" data-act="smart" style="margin:0 0 6px;border:2px solid var(--cobalt)"><div class="dur" style="background:var(--ink)"><div style="font-size:24px">Smart</div></div><div style="flex:1;min-width:0"><h3>Smart Workout</h3><p>Answer a few quick questions and get a circuit built for how you feel today. It adapts as you train.'+(S.smart.seeded?' Your level: '+S.smart.lvl.toFixed(1)+' of 3.':'')+'</p></div></button>';
+  h+='<h2>Preset workouts</h2><div class="list">'+PRESETS.map(function(p){return presetCard(p,"preset");}).join("")+'</div>';
+  if(S.custom.length){
+    h+='<h2>Your workouts</h2><div class="list">'+S.custom.map(function(p){return presetCard(p,"custom");}).join("")+'</div>';
+  }
+  h+='<p class="note" style="margin-top:22px">Sevens is an independent app inspired by the 12-exercise HICT circuit described by Brett Klika and Chris Jordan. It is not affiliated with or endorsed by any company. Talk to a doctor before starting a new exercise program.</p>';
+  return h;
+}
+function presetCard(p,kind){
+  var s=minutes(p), m=Math.floor(s/60), r=s%60;
+  return '<button class="preset" data-open="'+kind+':'+p.id+'"><div class="dur"><div>'+m+':'+(r<10?"0":"")+r+'<small>min</small></div></div><div style="flex:1;min-width:0"><h3>'+esc(p.n)+'</h3><p>'+esc(p.d||(p.x.length+" exercises"))+'</p>'+bar(p)+'</div></button>';
+}
+function viewLib(){
+  var h=header("Exercise library: "+EX.length+" movements.");
+  h+='<div class="chips" role="group" aria-label="Filter by focus">'+
+    [["all","All"]].concat(Object.keys(FOCUS).map(function(k){return [k,FOCUS[k].label];})).map(function(c){return '<button class="chip" data-filter="'+c[0]+'" aria-pressed="'+(filter===c[0])+'">'+c[1]+'</button>';}).join("")+'</div>';
+  h+='<div class="chips" role="group" aria-label="Filter by impact">'+
+    [["all","Any impact"],["low","Low impact"]].map(function(c){return '<button class="chip" data-impact="'+c[0]+'" aria-pressed="'+(impact===c[0])+'">'+c[1]+'</button>';}).join("")+'</div>';
+  var list=EX.filter(function(e){return (filter==="all"||e.f===filter)&&(impact==="all"||!e.imp);});
+  h+='<div class="list">'+list.map(function(e){return '<button class="ex" data-ex="'+e.id+'">'+glyph(e)+'<div><h3>'+esc(e.n)+'</h3><p>'+FOCUS[e.f].label+(e.base?", core 12":"")+(e.imp?", jumping":"")+'</p></div>'+levelDots(e.lv)+'</button>';}).join("")+'</div>';
+  return h;
+}
+var draft={name:"",w:30,r:10,x:[]};
+function viewBuild(){
+  var h=header("Build your own circuit.");
+  h+='<label class="f" for="bn">Workout name</label><input type="text" id="bn" value="'+esc(draft.name)+'" placeholder="Friday legs and lungs" maxlength="40">';
+  h+='<label class="f" for="bw">Work: <b id="bwv">'+draft.w+'</b> seconds</label><input type="range" id="bw" min="15" max="90" step="5" value="'+draft.w+'">';
+  h+='<label class="f" for="br">Rest: <b id="brv">'+draft.r+'</b> seconds</label><input type="range" id="br" min="5" max="60" step="5" value="'+draft.r+'">';
+  h+='<h2>Your sequence</h2>';
+  if(!draft.x.length) h+='<div class="empty">Nothing here yet. Tap exercises below to add them.</div>';
+  else {
+    h+='<div class="seq">'+draft.x.map(function(id,i){return '<div><span class="n">'+(i+1)+'</span><span style="flex:1">'+esc(BY[id].n)+'</span><button class="iconbtn" data-mv="'+i+':-1" aria-label="Move up">Up</button><button class="iconbtn" data-mv="'+i+':1" aria-label="Move down">Down</button><button class="iconbtn" data-rm="'+i+'" aria-label="Remove">Remove</button></div>';}).join("")+'</div>';
+    var tot=minutes(draft);
+    h+='<p class="note">'+draft.x.length+' exercises, about '+fmt(tot)+' total.</p><div class="row"><button class="ghost" data-act="savedraft" style="flex:1">Save workout</button><button class="primary" data-act="startdraft" style="flex:1">Start now</button></div>';
+  }
+  h+='<h2>Add exercises</h2><div class="list">'+EX.map(function(e){return '<button class="ex" data-add="'+e.id+'">'+glyph(e)+'<div><h3>'+esc(e.n)+'</h3><p>'+FOCUS[e.f].label+'</p></div>'+levelDots(e.lv)+'</button>';}).join("")+'</div>';
+  return h;
+}
+function viewHist(){
+  var h=header("Your completed workouts.");
+  if(!S.hist.length) return h+'<div class="empty">No workouts logged yet. Finish one from the Workouts tab and it shows up here.</div>';
+  h+='<div class="list">'+S.hist.slice().reverse().slice(0,60).map(function(x){var d=new Date(x.at);return '<div class="ex"><div class="glyph" style="background:var(--cobalt)" aria-hidden="true">'+Math.max(1,Math.round(x.sec/60))+'</div><div><h3>'+esc(x.n)+'</h3><p>'+d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})+', '+d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+'</p></div></div>';}).join("")+'</div>';
+  h+='<p><button class="ghost" data-act="clearhist" style="margin-top:16px">Clear history</button></p>';
+  return h;
+}
+
+/* ---------- Sheets ---------- */
+function openSheet(html){
+  $("layer").innerHTML='<div class="sheet" id="sheet"><div class="panel" role="dialog" aria-modal="true">'+html+'</div></div>';
+  var first=$("layer").querySelector("button"); if(first) first.focus();
+}
+function closeSheet(){$("layer").innerHTML="";}
+function workoutSheet(w,kind){
+  var s=minutes(w);
+  var h='<h3 class="big">'+esc(w.n)+'</h3><p class="tag">'+(w.d?esc(w.d)+" ":"")+fmt(s)+' total, '+w.w+' seconds on and '+w.r+' off.</p>'+bar(w);
+  h+='<ol class="steps">'+w.x.map(function(id){var e=BY[id];return '<li><button style="background:none;border:0;padding:0;text-decoration:underline;font-weight:600" data-ex="'+id+'">'+esc(e.n)+'</button>'+(e.sides?' (each side)':'')+'</li>';}).join("")+'</ol>';
+  h+='<div class="row" style="margin-top:18px;flex-wrap:wrap"><button class="ghost" data-act="close">Close</button>'+(kind==="smart"?'<button class="ghost" data-act="reshuffle">Reshuffle</button><button class="ghost" data-act="savegen">Save</button>':'')+(kind==="custom"?'<button class="ghost" data-del="'+w.id+'">Delete</button>':'')+'<button class="primary" data-start="'+kind+':'+w.id+'">Start workout</button></div>';
+  openSheet(h);
+}
+function exSheet(e){
+  var h='<div class="row">'+glyph(e)+'<div><h3 class="big" style="font-size:32px">'+esc(e.n)+'</h3><p class="tag" style="margin:0">'+FOCUS[e.f].label+(e.sides?", each side":"")+'</p></div></div>';
+  h+='<p style="font-size:18px;margin:16px 0">'+esc(e.t)+'</p><p class="note">Difficulty '+levelDots(e.lv)+(e.imp?' &nbsp;Involves jumping. Swap for a low-impact move if you need quiet or joint relief.':'')+'</p>';
+  h+='<button class="primary" data-act="close" style="margin-top:14px">Done</button>';
+  openSheet(h);
+}
+function settingsSheet(){
+  var h='<h3 class="big">Settings</h3>';
+  h+='<div class="tgl"><span>Voice prompts</span><input type="checkbox" id="sv" '+(S.set.voice?"checked":"")+' aria-label="Voice prompts"></div>';
+  h+='<div class="tgl"><span>Beeps and countdown in the last 5 seconds</span><input type="checkbox" id="ss" '+(S.set.sound?"checked":"")+' aria-label="Beeps and countdown in the last 5 seconds"></div>';
+  h+='<div class="tgl"><span>Speak the countdown aloud (5, 4, 3, 2, 1)</span><input type="checkbox" id="sp" '+(S.set.speak?"checked":"")+' aria-label="Speak the countdown aloud"></div>';
+  h+='<label class="f" for="sr">Get-ready time: <b id="srv">'+S.set.ready+'</b> seconds</label><input type="range" id="sr" min="3" max="20" value="'+S.set.ready+'">';
+  h+='<button class="primary" data-act="close" style="margin-top:18px">Done</button>';
+  openSheet(h);
+}
+
+/* ---------- Audio / voice ---------- */
+var ac=null;
+function beep(f,ms){
+  if(!S.set.sound) return;
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    var o=ac.createOscillator(),g=ac.createGain();
+    o.frequency.value=f;o.connect(g);g.connect(ac.destination);
+    g.gain.setValueAtTime(.2,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+ms/1000);
+    o.start();o.stop(ac.currentTime+ms/1000);
+  }catch(e){}
+}
+function say(t){
+  if(!S.set.voice||!window.speechSynthesis) return;
+  try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.rate=1.05;speechSynthesis.speak(u);}catch(e){}
+}
+
+/* ---------- Countdown ---------- */
+function countdown(n){
+  beep(n===1?1000:520+(5-n)*70, n===1?220:110);
+  if(S.set.speak&&window.speechSynthesis){
+    try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(String(n)));}catch(e){}
+  }
+}
+
+/* ---------- Player ---------- */
+var P=null, wake=null;
+function startWorkout(w){
+  closeSheet();
+  var segs=steps(w);
+  P={w:w,segs:segs,k:0,left:segs[0].d*1000,paused:false,last:performance.now(),lastSec:-1,timer:null,total:w.x.length,startedAt:Date.now(),finished:false};
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();}catch(e){}
+  try{if(navigator.wakeLock) navigator.wakeLock.request("screen").then(function(l){wake=l;}).catch(function(){});}catch(e){}
+  enterSeg(true);
+  P.timer=setInterval(tick,100);
+  drawPlayer();
+}
+function enterSeg(first){
+  var s=P.segs[P.k]; P.left=s.d*1000; P.lastSec=-1; P.last=performance.now();
+  if(s.t==="ready") say("Get ready. First up, "+s.ex.n);
+  else if(s.t==="work"){ beep(880,350); say(s.sw?"Switch sides":s.ex.n+(s.label?", "+s.label:"")); }
+  else { beep(520,250); say("Rest. Next, "+s.next.n); }
+}
+function tick(){
+  if(!P||P.paused||P.finished) return;
+  var now=performance.now(); P.left-=now-P.last; P.last=now;
+  var secs=Math.ceil(P.left/1000);
+  if(secs!==P.lastSec){
+    P.lastSec=secs;
+    if(secs>0&&secs<=5) countdown(secs);
+    drawClock();
+  }
+  if(P.left<=0){
+    if(P.k>=P.segs.length-1) return finish();
+    P.k++; enterSeg(); drawPlayer();
+  }
+}
+function finish(){
+  P.finished=true; clearInterval(P.timer);
+  var sec=Math.round((Date.now()-P.startedAt)/1000);
+  S.hist.push({n:P.w.n,at:Date.now(),sec:minutes(P.w)}); save("sv_hist",S.hist);
+  S.smart.last=P.w.x.concat(S.smart.last||[]).slice(0,30); save("sv_smart",S.smart);
+  beep(988,500); say("Workout complete. Nice work.");
+  releaseWake(); drawPlayer();
+}
+function releaseWake(){try{if(wake){wake.release();wake=null;}}catch(e){}}
+function exitPlayer(){
+  if(P&&P.timer) clearInterval(P.timer);
+  try{speechSynthesis&&speechSynthesis.cancel();}catch(e){}
+  releaseWake(); P=null; $("playerHost").innerHTML=""; render();
+}
+function drawClock(){
+  var c=$("clk"); if(!c||!P) return;
+  var n=Math.max(0,Math.ceil(P.left/1000));
+  c.textContent=n;
+  c.classList.remove("pop");
+  if(n>0&&n<=5){ void c.offsetWidth; c.classList.add("pop"); }
+}
+function drawPlayer(){
+  var host=$("playerHost");
+  if(P.finished){
+    host.innerHTML='<div id="player" class="done" role="dialog" aria-label="Workout complete"><div class="ptop"><span></span><button data-pl="exit">Close</button></div><div class="pmid"><p class="phase">Workout complete</p><h2 class="pname" style="margin:10px 0">'+esc(P.w.n)+'</h2><p class="cue">'+P.total+' exercises, '+fmt(minutes(P.w))+' of work. It has been logged in Progress.</p>'+fbBlock()+'</div><div class="pctl"><button class="main" data-pl="exit" style="width:auto;border-radius:44px;padding:0 34px">Done</button></div></div>';
+    return;
+  }
+  var s=P.segs[P.k], cls=s.t, e=s.ex;
+  var label=s.t==="ready"?"Get ready":s.t==="rest"?"Rest":"Work";
+  var title=s.t==="rest"?"Next: "+s.next.n:e.n;
+  var prog=P.w.x.map(function(_,i){return '<i class="'+(i<(s.t==="rest"?s.i+1:s.i)?"d":"")+'"></i>';}).join("");
+  var cue=s.t==="work"||s.t==="ready"?e.t:(s.next.t);
+  host.innerHTML='<div id="player" class="'+cls+'" role="dialog" aria-label="Workout in progress">'+
+    '<div class="ptop"><button data-pl="exit">End</button><span style="font-weight:700">'+esc(P.w.n)+'</span><span style="width:60px;text-align:right;font-weight:700">'+(s.t==="ready"?0:(s.t==="rest"?s.i+1:s.i+1))+'/'+P.total+'</span></div>'+
+    '<div class="prog" aria-hidden="true">'+prog+'</div>'+
+    '<div class="pmid"><p class="phase">'+label+(s.label?', '+s.label:"")+'</p><h2 class="pname">'+esc(title)+'</h2><div class="clock '+(s.t==="work"?"pulse":"")+'" id="clk" aria-live="off">'+Math.max(0,Math.ceil(P.left/1000))+'</div><p class="cue">'+esc(cue)+'</p></div>'+
+    '<div class="pctl"><button data-pl="back" aria-label="Previous">Back</button><button class="main" data-pl="pause">'+(P.paused?"Resume":"Pause")+'</button><button data-pl="skip" aria-label="Skip">Skip</button></div>'+
+  '</div>';
+}
+function playerAction(a){
+  if(!P) return;
+  if(a==="exit"){ if(P.finished||confirm("End this workout?")) exitPlayer(); return; }
+  if(a==="pause"){ P.paused=!P.paused; P.last=performance.now(); try{P.paused?speechSynthesis.cancel():0;}catch(e){} drawPlayer(); return; }
+  if(a==="skip"){ if(P.k>=P.segs.length-1) return finish(); P.k++; enterSeg(); drawPlayer(); return; }
+  if(a==="back"){ P.k=Math.max(0,P.k-1); if(P.segs[P.k].t==="rest"&&P.k>0) P.k--; enterSeg(); drawPlayer(); }
+}
+
+/* ---------- Smart Workout ---------- */
+var GEN=null, SM={energy:3,mood:3,time:10,focus:"any",impact:"any",fit:2};
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function genSmart(q){
+  var ready=(q.energy+q.mood)/2, lvl=S.smart.lvl;
+  var eff=clamp(lvl+(ready-3)*0.3,1,3);
+  var w=ready>=4?40:ready>=3?30:25, r=ready>=3?10:15;
+  if(eff>2.5&&ready>=4) w=45;
+  if(lvl<1.6) r+=5;
+  var n=clamp(Math.round(q.time*60/(w+r)),4,16);
+  var pool=EX.filter(function(e){return q.impact==="any"||!e.imp;});
+  var recent=S.smart.last||[], picks=[];
+  for(var k=0;k<n;k++){
+    var prev=picks.length?BY[picks[picks.length-1]]:null;
+    var cands=pool.filter(function(e){return picks.indexOf(e.id)<0;});
+    if(!cands.length) cands=pool.slice();
+    var ws=cands.map(function(e){
+      var wt=Math.exp(-Math.pow(e.lv-eff,2));
+      if(q.focus!=="any") wt*=(e.f===q.focus?4:(e.f==="total"?1:0.25));
+      else if(prev&&prev.f===e.f) wt*=0.1;
+      var ri=recent.indexOf(e.id);
+      if(ri>-1) wt*=ri<12?0.3:0.6;
+      return wt;
+    });
+    var sum=ws.reduce(function(a,b){return a+b;},0), x=Math.random()*sum, idx=0;
+    for(;idx<ws.length-1;idx++){x-=ws[idx]; if(x<=0) break;}
+    picks.push(cands[idx].id);
+  }
+  if(picks.length>5){ // easiest non-sided move goes first as a warm-up
+    var bi=0,bl=9;
+    picks.forEach(function(id,i){var e=BY[id]; if(!e.sides&&e.lv<bl){bl=e.lv;bi=i;}});
+    var wu=picks.splice(bi,1)[0]; picks.unshift(wu);
+  }
+  var vibe=ready<2.5?"a low-energy day, so rest is longer and the moves are gentler":ready<3.5?"a steady day, so the pace is moderate":"a high-energy day, so work intervals are longer and the moves are tougher";
+  return {id:"smart",smart:1,n:q.focus==="any"?"Smart Workout":"Smart: "+FOCUS[q.focus].label,d:"Built for "+vibe+". "+n+" moves pitched at level "+eff.toFixed(1)+" of 3.",w:w,r:r,x:picks};
+}
+function chipRow(label,key,opts,cur){
+  return '<p style="font-weight:600;margin:16px 0 6px">'+label+'</p><div class="chips" role="group" aria-label="'+label+'">'+opts.map(function(o){return '<button class="chip" data-sm="'+key+':'+o[0]+'" aria-pressed="'+(String(cur)===String(o[0]))+'">'+o[1]+'</button>';}).join("")+'</div>';
+}
+function smartSheet(){
+  var h='<h3 class="big">Smart Workout</h3><p class="tag">Tell me how today looks. I build the circuit and tune it to your level.</p>';
+  if(!S.smart.seeded) h+=chipRow("Your fitness","fit",[[1.2,"Just starting"],[2,"Fairly active"],[2.8,"Very fit"]],SM.fit);
+  else h+='<p class="note" style="margin:12px 0 0">Your level: '+S.smart.lvl.toFixed(1)+' of 3. It shifts after each workout based on how you rate it. <button data-act="smartreset" style="background:none;border:0;text-decoration:underline;padding:0">Reset</button></p>';
+  h+=chipRow("Energy right now","energy",[[1,"Drained"],[2,"Low"],[3,"Okay"],[4,"Good"],[5,"Charged"]],SM.energy);
+  h+=chipRow("Motivation","mood",[[1,"Barely"],[2,"Meh"],[3,"Okay"],[4,"Into it"],[5,"Fired up"]],SM.mood);
+  h+=chipRow("Time available","time",[[5,"5 min"],[10,"10 min"],[15,"15 min"],[20,"20 min"],[30,"30 min"]],SM.time);
+  h+=chipRow("Focus","focus",[["any","Balanced"],["upper","Upper"],["lower","Lower"],["core","Core"],["cardio","Cardio"]],SM.focus);
+  h+=chipRow("Impact","impact",[["any","Anything"],["low","No jumping"]],SM.impact);
+  h+='<div class="row" style="margin-top:22px"><button class="ghost" data-act="close">Cancel</button><button class="primary" data-act="gensmart">Build my workout</button></div>';
+  openSheet(h);
+}
+function fbBlock(){
+  if(P.fb){var m={easy:"Noted. Your next Smart Workout will be harder.",right:"Noted. Your level stays about where it is.",hard:"Noted. Your next Smart Workout will be easier."};return '<p class="cue" style="margin-top:22px;font-weight:700">'+m[P.fb]+'</p>';}
+  return '<p class="phase" style="margin-top:26px">How did that feel?</p><div class="fbrow"><button data-fb="easy">Too easy</button><button data-fb="right">Just right</button><button data-fb="hard">Too hard</button></div>';
+}
+
+/* ---------- Events ---------- */
+function findWorkout(ref){
+  var p=ref.split(":"); if(p[0]==="smart") return GEN;
+  var list=p[0]==="custom"?S.custom:PRESETS;
+  return list.filter(function(x){return x.id===p[1];})[0];
+}
+document.addEventListener("click",function(ev){
+  var t=ev.target.closest("[data-tab],[data-filter],[data-impact],[data-open],[data-ex],[data-start],[data-act],[data-add],[data-mv],[data-rm],[data-del],[data-pl],[data-fb],[data-sm]");
+  if(!t){ if(ev.target.id==="sheet") closeSheet(); return; }
+  var d=t.dataset;
+  if(d.sm){var kv=d.sm.split(":");SM[kv[0]]=isNaN(+kv[1])?kv[1]:+kv[1];Array.prototype.forEach.call(t.parentNode.querySelectorAll("button"),function(b){b.setAttribute("aria-pressed",b===t?"true":"false");});return;}
+  if(d.fb&&P){var dl={easy:0.3,right:0.05,hard:-0.3}[d.fb];S.smart.lvl=clamp(Math.round((S.smart.lvl+dl)*100)/100,1,3);S.smart.seeded=true;save("sv_smart",S.smart);P.fb=d.fb;drawPlayer();return;}
+  if(d.pl){ playerAction(d.pl); return; }
+  if(d.tab){ tab=d.tab; render(); window.scrollTo(0,0); return; }
+  if(d.filter){ filter=d.filter; render(); return; }
+  if(d.impact){ impact=d.impact; render(); return; }
+  if(d.open){ workoutSheet(findWorkout(d.open),d.open.split(":")[0]); return; }
+  if(d.start){ startWorkout(findWorkout(d.start)); return; }
+  if(d.ex){ exSheet(BY[d.ex]); return; }
+  if(d.add){ draft.x.push(d.add); render(); return; }
+  if(d.rm){ draft.x.splice(+d.rm,1); render(); return; }
+  if(d.mv){ var q=d.mv.split(":"),i=+q[0],j=i+ +q[1]; if(j>=0&&j<draft.x.length){var tmp=draft.x[i];draft.x[i]=draft.x[j];draft.x[j]=tmp;} render(); return; }
+  if(d.del){ if(confirm("Delete this workout?")){S.custom=S.custom.filter(function(x){return x.id!==d.del;});save("sv_custom",S.custom);closeSheet();render();} return; }
+  var a=d.act;
+  if(a==="close") closeSheet();
+  else if(a==="settings") settingsSheet();
+  else if(a==="smart") smartSheet();
+  else if(a==="smartreset"){ S.smart.seeded=false; S.smart.lvl=1.5; save("sv_smart",S.smart); smartSheet(); }
+  else if(a==="gensmart"){ if(!S.smart.seeded){S.smart.lvl=SM.fit;S.smart.seeded=true;save("sv_smart",S.smart);} GEN=genSmart(SM); workoutSheet(GEN,"smart"); }
+  else if(a==="reshuffle"){ GEN=genSmart(SM); workoutSheet(GEN,"smart"); }
+  else if(a==="savegen"){ S.custom.push({id:"c"+Date.now(),n:GEN.n,d:GEN.x.length+" exercises, "+GEN.w+" on, "+GEN.r+" off",w:GEN.w,r:GEN.r,x:GEN.x.slice()}); save("sv_custom",S.custom); closeSheet(); render(); }
+  else if(a==="clearhist"){ if(confirm("Clear all workout history?")){S.hist=[];save("sv_hist",S.hist);render();} }
+  else if(a==="savedraft"){
+    var nm=(draft.name||"").trim()||"Custom workout";
+    S.custom.push({id:"c"+Date.now(),n:nm,d:draft.x.length+" exercises, "+draft.w+" on, "+draft.r+" off",w:draft.w,r:draft.r,x:draft.x.slice()});
+    save("sv_custom",S.custom); draft={name:"",w:30,r:10,x:[]}; tab="home"; render(); window.scrollTo(0,0);
+  }
+  else if(a==="startdraft"){ startWorkout({id:"draft",n:(draft.name||"Custom workout"),w:draft.w,r:draft.r,x:draft.x.slice()}); }
+});
+document.addEventListener("input",function(ev){
+  var t=ev.target;
+  if(t.id==="bn") draft.name=t.value;
+  else if(t.id==="bw"){draft.w=+t.value;$("bwv").textContent=t.value;}
+  else if(t.id==="br"){draft.r=+t.value;$("brv").textContent=t.value;}
+  else if(t.id==="sr"){S.set.ready=+t.value;$("srv").textContent=t.value;save("sv_set",S.set);}
+  else if(t.id==="sv"){S.set.voice=t.checked;save("sv_set",S.set);}
+  else if(t.id==="ss"){S.set.sound=t.checked;save("sv_set",S.set);}
+  else if(t.id==="sp"){S.set.speak=t.checked;save("sv_set",S.set);}
+});
+document.addEventListener("keydown",function(ev){
+  if(ev.key==="Escape"&&$("sheet")) closeSheet();
+  if(P&&!P.finished&&ev.key===" "){ev.preventDefault();playerAction("pause");}
+});
+
+render();
+})();
+</script>
+<script>
+if("serviceWorker" in navigator && location.protocol==="https:"){
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});
+}
+</script>
+</body>
+</html>
